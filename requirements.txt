@@ -1,0 +1,57 @@
+# ==============================================================================
+# YÜZ TANIMA YOKLAMA SİSTEMİ - GEREKLİ KÜTÜPHANELER
+# Face Recognition Attendance System - Requirements
+# ==============================================================================
+# Kurulum: pip install -r requirements.txt
+# ==============================================================================
+
+# OpenCV - Görüntü işleme ve kamera erişimi
+opencv-python>=4.5.0
+
+# face_recognition - Yüz algılama ve tanıma
+# NOT: Windows'ta dlib kurulumu için Visual Studio Build Tools gerekebilir
+face-recognition>=1.3.0
+
+# dlib - face_recognition'ın bağımlılığı
+# Eğer face_recognition kurulumu başarısız olursa:
+# 1. cmake kurun: pip install cmake
+# 2. Visual Studio Build Tools kurun (Windows)
+# 3. Sonra tekrar deneyin: pip install dlib face_recognition
+dlib>=19.22
+
+# NumPy - Sayısal işlemler
+numpy>=1.21.0
+
+# Pandas - Excel işlemleri
+pandas>=1.3.0
+
+# openpyxl - Excel dosya yazma/okuma
+openpyxl>=3.0.0
+
+# cmake - dlib derlemesi için gerekli (opsiyonel)
+cmake>=3.18.0
+
+# ==============================================================================
+# KURULUM TALİMATLARI
+# ==============================================================================
+# 
+# 1. TEMEL KURULUM (Tüm platformlar):
+#    pip install -r requirements.txt
+#
+# 2. WINDOWS KULLANICILARI İÇİN:
+#    - Eğer face_recognition kurulumu başarısız olursa:
+#    - Visual Studio Build Tools kurun
+#    - Veya conda kullanın: conda install -c conda-forge dlib
+#
+# 3. MAC KULLANICILARI İÇİN:
+#    brew install cmake
+#    pip install dlib
+#    pip install face_recognition
+#
+# 4. LINUX KULLANICILARI İÇİN:
+#    sudo apt-get install cmake
+#    sudo apt-get install libboost-all-dev
+#    pip install dlib
+#    pip install face_recognition
+#
+# ==============================================================================
