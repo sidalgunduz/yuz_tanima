@@ -71,6 +71,17 @@ class MainMenu(ctk.CTk):
         )
         self.btn_update_encoding.pack(pady=12, fill="x", padx=20)
 
+        # Performans Analizi
+        self.btn_analysis = ctk.CTkButton(
+            self.sidebar,
+            text="📈 Performans Analizi",
+            height=45,
+            fg_color="#9B59B6",
+            hover_color="#7D3C98",
+            command=self.run_analysis,
+        )
+        self.btn_analysis.pack(pady=12, fill="x", padx=20)
+
         # Çıkış
         self.btn_exit = ctk.CTkButton(
             self.sidebar,
@@ -220,6 +231,13 @@ class MainMenu(ctk.CTk):
         messagebox.showinfo("Bilgi", "Encoding güncelleme başlıyor...\nBu işlem biraz zaman alabilir.")
         subprocess.Popen([PYTHON_EXE, "update_encodings.py"])
         messagebox.showinfo("Başarılı", "Encoding güncelleme işlemi başlatıldı!\nTamamlandığında yeni öğrenciler tanınabilir olacak.")
+
+    # =====================================================
+    # PERFORMANS ANALİZİ
+    # =====================================================
+    def run_analysis(self):
+        messagebox.showinfo("Bilgi", "Performans analizi başlıyor...\nConfusion Matrix, ROC Eğrisi ve metrikler oluşturulacak.")
+        subprocess.Popen([PYTHON_EXE, "analysis.py"])
 
     # =====================================================
     # RAPORLARI AÇ
