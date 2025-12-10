@@ -50,29 +50,21 @@ COLOR_WHITE = (255, 255, 255)
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 
-# ============================================================================
-# 📌 YENİ EKLENEN: GÖRÜNTÜ ÖN İŞLEME FONKSİYONU
-# ============================================================================
+# ============================================================
+# 📌 GÖRÜNTÜ ÖN İŞLEME
+# ============================================================
 def preprocess_frame(frame):
-    """
-    Yüz tanıma doğruluğunu artırmak için:
-    1. Grayscale -> ışık dalgalanmasını azaltır
-    2. Histogram eşitleme -> karanlık yüzleri belirginleştirir
-    3. Gaussian blur -> gürültüyü azaltır
-    """
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.equalizeHist(gray)
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
-
-    # face_recognition RGB ister
     gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     rgb = cv2.cvtColor(gray_bgr, cv2.COLOR_BGR2RGB)
     return rgb
 
 
-# ============================================================================
-# YÜZ TANIMA SİSTEMİ SINIFI
-# ============================================================================
+# ============================================================
+# ANA SINIF
+# ============================================================
 class FaceRecognitionAttendance:
 
     def __init__(self):
@@ -85,19 +77,19 @@ class FaceRecognitionAttendance:
         self.known_encodings = []
         self.known_names = []
         self.known_ids = []
-        self.marked_today = set()
+        self.marked_today = set()  # 🔥 Bugün kaydedilenler
         self.camera = None
         self.frame_count = 0
 
         self._load_face_data()
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def _load_face_data(self):
         print_info("Encoding verileri yükleniyor...")
 
         data = load_encodings()
         if data is None:
-            print_error("Encoding dosyası bulunamadı! Önce encode_faces.py çalıştır.")
+            print_error("Encoding dosyası bulunamadı!")
             return False
 
         self.known_encodings = data["encodings"]
@@ -107,10 +99,9 @@ class FaceRecognitionAttendance:
         print_success(f"{len(self.known_encodings)} öğrenci yüklendi.")
         for name, sid in zip(self.known_names, self.known_ids):
             print(f"  • {name} (No: {sid})")
-
         return True
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def _init_camera(self):
         self.camera = cv2.VideoCapture(CAMERA_INDEX)
 
@@ -122,23 +113,22 @@ class FaceRecognitionAttendance:
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
         return True
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
+    # 🔥 YENİ — SADECE 1 KEZ KAYIT!
     def _mark_student_attendance(self, name, student_id):
-        if student_id in self.marked_today:
-            success, msg = mark_attendance(name, student_id, "Çıktı")
-            if success:
-                print_success(f"ÇIKIŞ → {name} ({student_id})")
-            return
 
+        # ➤ Eğer öğrenci bugün zaten kaydedildiyse hiçbir şey yapma!
+        if student_id in self.marked_today:
+            return  
+
+        # ➤ İlk defa görülüyorsa Excel’e Giriş yaz
         success, msg = mark_attendance(name, student_id, "Geldi")
         if success:
             self.marked_today.add(student_id)
             print_success(f"GİRİŞ → {name} ({student_id})")
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def _process_frame(self, frame):
-
-        # 📌 YENİ: ÖN İŞLEME BURADA UYGULANDI
         small = cv2.resize(frame, (0, 0), fx=SCALE_FACTOR, fy=SCALE_FACTOR)
         rgb_small = preprocess_frame(small)
 
@@ -148,6 +138,7 @@ class FaceRecognitionAttendance:
         recognized = []
 
         for encoding, loc in zip(face_encodings, face_locations):
+
             matches = face_recognition.compare_faces(
                 self.known_encodings, encoding, tolerance=FACE_MATCH_TOLERANCE
             )
@@ -163,14 +154,14 @@ class FaceRecognitionAttendance:
                     name = self.known_names[best]
                     sid = self.known_ids[best]
                     self._mark_student_attendance(name, sid)
+
                 else:
+                    # Bilinmeyeni kaydet
                     top, right, bottom, left = loc
-                    top, right, bottom, left = (
-                        int(top / SCALE_FACTOR),
-                        int(right / SCALE_FACTOR),
-                        int(bottom / SCALE_FACTOR),
-                        int(left / SCALE_FACTOR),
-                    )
+                    top = int(top / SCALE_FACTOR)
+                    right = int(right / SCALE_FACTOR)
+                    bottom = int(bottom / SCALE_FACTOR)
+                    left = int(left / SCALE_FACTOR)
 
                     face_img = frame[top:bottom, left:right]
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -193,32 +184,21 @@ class FaceRecognitionAttendance:
 
         return scaled, recognized
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def _draw_results(self, frame, face_locations, recognized):
         for (top, right, bottom, left), (name, sid) in zip(face_locations, recognized):
-
             color = COLOR_GREEN if name != "Bilinmeyen" else COLOR_RED
 
             cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
             label = name if sid is None else f"{name} ({sid})"
 
-            cv2.rectangle(
-                frame, (left, bottom - 35), (right, bottom), color, cv2.FILLED
-            )
-            cv2.putText(
-                frame,
-                label,
-                (left + 6, bottom - 6),
-                FONT,
-                0.6,
-                COLOR_WHITE,
-                2,
-            )
+            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), color, cv2.FILLED)
+            cv2.putText(frame, label, (left + 6, bottom - 6), FONT, 0.6, COLOR_WHITE, 2)
 
         return frame
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def show_attendance_summary(self):
         print_header("YOKLAMA ÖZETİ")
         summary = get_attendance_summary()
@@ -230,7 +210,7 @@ class FaceRecognitionAttendance:
         for student in summary["students"]:
             print(" •", student)
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------
     def run(self):
         if not self._init_camera():
             return
@@ -257,7 +237,6 @@ class FaceRecognitionAttendance:
 
             if key == ord("q") or key == 27:
                 break
-
             elif key == ord("s"):
                 self.show_attendance_summary()
 
@@ -265,7 +244,7 @@ class FaceRecognitionAttendance:
         cv2.destroyAllWindows()
 
 
-# ============================================================================
+# ============================================================
 def main():
     print("=== YÜZ TANIMA TABANLI YOKLAMA SİSTEMİ ===")
     system = FaceRecognitionAttendance()

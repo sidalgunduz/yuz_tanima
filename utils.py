@@ -383,51 +383,48 @@ def load_encodings() -> Optional[Dict[str, List]]:
 def get_dataset_images() -> List[Tuple[str, str, str]]:
     """
     Dataset klasöründeki tüm resimleri listeler.
-    
-    Dosya adı formatı: NUMARA_ADSOYAD.jpg (örn: 123_Ali_Yilmaz.jpg)
-    
-    Returns:
-        List[Tuple[str, str, str]]: [(dosya_yolu, numara, ad_soyad), ...]
-        
-    Raises:
-        ValueError: Geçersiz dosya adı formatı
+    Dosya adı formatı: NUMARA_ADSOYAD.jpg
     """
     images = []
-    
-    # Desteklenen resim formatları
     valid_extensions = ('.jpg', '.jpeg', '.png', '.bmp')
-    
+
     try:
         if not os.path.exists(DATASET_DIR):
             print(f"[UYARI] Dataset klasörü bulunamadı: {DATASET_DIR}")
             return images
-        
-        for filename in os.listdir(DATASET_DIR):
-            # Uzantı kontrolü
+
+        # KLASÖRDEKİ DOSYALARI GÜVENLİ ŞEKİLDE OKU
+        for filename in sorted(os.listdir(DATASET_DIR), key=str.lower):
+            file_path = os.path.join(DATASET_DIR, filename)
+
+            # Gizli dosyaları, klasörleri, bozuk dosyaları atla
+            if not os.path.isfile(file_path):
+                continue
+
+            # Geçerli uzantı kontrolü
             if not filename.lower().endswith(valid_extensions):
                 continue
-            
-            # Dosya adını parse et (NUMARA_ADSOYAD.uzanti)
+
+            # Dosya adını parse et
             name_part = os.path.splitext(filename)[0]
             parts = name_part.split('_', 1)
-            
-            if len(parts) >= 2:
+
+            if len(parts) >= 2 and parts[0].isdigit():
                 student_id = parts[0]
                 student_name = parts[1].replace('_', ' ')
-                file_path = os.path.join(DATASET_DIR, filename)
-                
                 images.append((file_path, student_id, student_name))
                 print(f"[INFO] Bulundu: {student_name} ({student_id})")
             else:
                 print(f"[UYARI] Geçersiz dosya adı formatı: {filename}")
                 print("[UYARI] Format: NUMARA_ADSOYAD.jpg olmalı")
-        
+
         print(f"[INFO] Toplam {len(images)} resim bulundu.")
         return images
-        
+
     except Exception as e:
         print(f"[HATA] Dataset okunamadı: {str(e)}")
         return images
+
 
 
 def parse_filename(filename: str) -> Tuple[Optional[str], Optional[str]]:
