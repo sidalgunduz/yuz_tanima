@@ -3,6 +3,10 @@ from tkinter import filedialog, messagebox
 import subprocess
 import shutil
 import os
+import sys
+
+# Sanal ortamdaki Python yorumlayıcısı
+PYTHON_EXE = sys.executable
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -55,6 +59,17 @@ class MainMenu(ctk.CTk):
             command=self.show_add_student_page,
         )
         self.btn_add_student.pack(pady=12, fill="x", padx=20)
+
+        # Encoding Güncelle
+        self.btn_update_encoding = ctk.CTkButton(
+            self.sidebar,
+            text="🔄 Encoding Güncelle",
+            height=45,
+            fg_color="#28A745",
+            hover_color="#1E7B34",
+            command=self.update_encodings,
+        )
+        self.btn_update_encoding.pack(pady=12, fill="x", padx=20)
 
         # Çıkış
         self.btn_exit = ctk.CTkButton(
@@ -170,7 +185,7 @@ class MainMenu(ctk.CTk):
 
         messagebox.showinfo("Başarılı", "Öğrenci kaydedildi! Encoding güncelleniyor...")
 
-        subprocess.Popen(["python", "encode_faces.py"])
+        subprocess.Popen([PYTHON_EXE, "encode_faces.py"])
 
         messagebox.showinfo("Tamam", "İşlem tamamlandı! Artık öğrenci tanınabilir.")
         self.show_home_page()
@@ -196,8 +211,15 @@ class MainMenu(ctk.CTk):
     # KAMERA BAŞLAT
     # =====================================================
     def start_camera(self):
-        subprocess.call(["python", "main.py"])
+        subprocess.call([PYTHON_EXE, "main.py"])
 
+    # =====================================================
+    # ENCODING GÜNCELLE
+    # =====================================================
+    def update_encodings(self):
+        messagebox.showinfo("Bilgi", "Encoding güncelleme başlıyor...\nBu işlem biraz zaman alabilir.")
+        subprocess.Popen([PYTHON_EXE, "update_encodings.py"])
+        messagebox.showinfo("Başarılı", "Encoding güncelleme işlemi başlatıldı!\nTamamlandığında yeni öğrenciler tanınabilir olacak.")
 
     # =====================================================
     # RAPORLARI AÇ
