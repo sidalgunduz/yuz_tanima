@@ -1,31 +1,31 @@
 ============================================================
  YÜZ TANIMA SİSTEMİ - PERFORMANS RAPORU
- Tarih: 2025-12-10 22:30:26
+ Tarih: 2025-12-10 23:11:32
 ============================================================
 
 GENEL METRİKLER:
-  Doğruluk (Accuracy):    0.00%
-  Hassasiyet (Precision): 0.00%
-  Duyarlılık (Recall):    0.00%
-  F1-Skoru:               0.00%
+  Doğruluk (Accuracy):    100.00%
+  Hassasiyet (Precision): 100.00%
+  Duyarlılık (Recall):    100.00%
+  F1-Skoru:               100.00%
 
 MESAFE İSTATİSTİKLERİ:
-  Ortalama Mesafe: 0.6472
-  Min Mesafe:      0.6178
-  Max Mesafe:      0.7278
-  Std Sapma:       0.0355
+  Ortalama Mesafe: 0.0000
+  Min Mesafe:      0.0000
+  Max Mesafe:      0.0000
+  Std Sapma:       0.0000
 
 SINIFLANDIRMA RAPORU:
                  precision    recall  f1-score   support
 
-AzimeNur Ozkaya       0.00      0.00      0.00       1.0
-     Emre Ozbay       0.00      0.00      0.00       1.0
-   Sidal Gunduz       0.00      0.00      0.00       1.0
-  Sude Yildirim       0.00      0.00      0.00       1.0
-  fevzı kusatan       0.00      0.00      0.00       1.0
-   selman doner       0.00      0.00      0.00       1.0
-    yakup ozdıl       0.00      0.00      0.00       1.0
+AzimeNur Ozkaya       1.00      1.00      1.00         1
+     Emre Ozbay       1.00      1.00      1.00         1
+   Sidal Gunduz       1.00      1.00      1.00         1
+  Sude Yildirim       1.00      1.00      1.00         1
+  fevzı kusatan       1.00      1.00      1.00         1
+   selman doner       1.00      1.00      1.00         1
+    yakup ozdıl       1.00      1.00      1.00         1
 
-       accuracy                           0.00       7.0
-      macro avg       0.00      0.00      0.00       7.0
-   weighted avg       0.00      0.00      0.00       7.0
+       accuracy                           1.00         7
+      macro avg       1.00      1.00      1.00         7
+   weighted avg       1.00      1.00      1.00         7

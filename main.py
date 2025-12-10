@@ -78,6 +78,7 @@ class FaceRecognitionAttendance:
         self.known_names = []
         self.known_ids = []
         self.marked_today = set()  # 🔥 Bugün kaydedilenler
+        self.unknown_saved = False  # 🔥 Bilinmeyen kişi kaydedildi mi
         self.camera = None
         self.frame_count = 0
 
@@ -156,18 +157,20 @@ class FaceRecognitionAttendance:
                     self._mark_student_attendance(name, sid)
 
                 else:
-                    # Bilinmeyeni kaydet
-                    top, right, bottom, left = loc
-                    top = int(top / SCALE_FACTOR)
-                    right = int(right / SCALE_FACTOR)
-                    bottom = int(bottom / SCALE_FACTOR)
-                    left = int(left / SCALE_FACTOR)
+                    # Bilinmeyeni sadece 1 kez kaydet
+                    if not self.unknown_saved:
+                        top, right, bottom, left = loc
+                        top = int(top / SCALE_FACTOR)
+                        right = int(right / SCALE_FACTOR)
+                        bottom = int(bottom / SCALE_FACTOR)
+                        left = int(left / SCALE_FACTOR)
 
-                    face_img = frame[top:bottom, left:right]
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    cv2.imwrite(f"unknown/unknown_{timestamp}.jpg", face_img)
+                        face_img = frame[top:bottom, left:right]
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        cv2.imwrite(f"unknown/unknown_{timestamp}.jpg", face_img)
 
-                    print_warning("Bilinmeyen kişi tespit edildi – fotoğraf kaydedildi.")
+                        print_warning("Bilinmeyen kişi tespit edildi – fotoğraf kaydedildi.")
+                        self.unknown_saved = True
 
             recognized.append((name, sid))
 

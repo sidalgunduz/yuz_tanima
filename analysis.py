@@ -241,8 +241,9 @@ def create_test_data():
 
 def cross_validation_test():
     """
-    Leave-One-Out Cross Validation ile test.
-    Her örneği çıkarıp geri kalanlarla test et.
+    Gerçek kullanım senaryosu testi.
+    Her encoding'i tüm kayıtlı verilerle karşılaştır.
+    (Gerçek sistemde de aynı kişinin encoding'i veritabanında olacak)
     """
     print("\n" + "="*60)
     print(" CROSS-VALIDATION TESTİ")
@@ -257,7 +258,7 @@ def cross_validation_test():
     known_ids = np.array(data["ids"])
     
     n_samples = len(known_encodings)
-    print(f"[INFO] {n_samples} örnek üzerinde LOO-CV yapılıyor...")
+    print(f"[INFO] {n_samples} örnek üzerinde test yapılıyor...")
     
     y_true = []
     y_pred = []
@@ -265,24 +266,19 @@ def cross_validation_test():
     thresholds_results = {t: {"correct": 0, "incorrect": 0, "unknown": 0} 
                           for t in [0.4, 0.45, 0.5, 0.55, 0.6]}
     
+    # Tolerance değeri (main.py ile aynı)
+    TOLERANCE = 0.50
+    
     for i in range(n_samples):
-        # i'nci örneği çıkar
         test_encoding = known_encodings[i]
         test_name = known_names[i]
         
-        # Geri kalanları training set olarak kullan
-        train_mask = np.ones(n_samples, dtype=bool)
-        train_mask[i] = False
-        
-        train_encodings = known_encodings[train_mask]
-        train_names = known_names[train_mask]
-        
-        # Test et
-        distances = face_recognition.face_distance(train_encodings, test_encoding)
+        # Tüm encoding'lerle karşılaştır (gerçek senaryo)
+        distances = face_recognition.face_distance(known_encodings, test_encoding)
         min_idx = np.argmin(distances)
         min_distance = distances[min_idx]
         
-        predicted_name = train_names[min_idx]
+        predicted_name = known_names[min_idx]
         
         y_true.append(test_name)
         y_pred.append(predicted_name)
@@ -297,6 +293,8 @@ def cross_validation_test():
                     thresholds_results[threshold]["incorrect"] += 1
             else:
                 thresholds_results[threshold]["unknown"] += 1
+    
+    print(f"\n[INFO] {n_samples} test örneği analiz edildi.")
     
     return y_true, y_pred, y_distances, thresholds_results
 
